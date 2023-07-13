@@ -436,6 +436,42 @@ void sunxi_flush_cache_all()
 }
 #endif
 
+int sunxi_get_dma_buf_fd(void *pbuf)
+{
+    int flag = 0;
+    unsigned long addr_vir = (unsigned long)pbuf;
+    int fd = 0;
+    buffer_node * tmp;
+
+    if (0 == pbuf)
+    {
+        // logv("can not vir2phy NULL buffer \n");
+        return 0;
+    }
+
+    pthread_mutex_lock(&g_mutex_alloc);
+
+    aw_mem_list_for_each_entry(tmp, &g_alloc_context->list, i_list)
+    {
+        if (addr_vir >= tmp->vir
+            && addr_vir < tmp->vir + tmp->size)
+        {
+            fd = tmp->fd_data.aw_fd;
+            flag = 1;
+            break;
+        }
+    }
+
+    if (0 == flag)
+    {
+        loge("ion_get_dma_buf_fd failed, do not find virtual address: 0x%lx \n", addr_vir);
+    }
+
+    pthread_mutex_unlock(&g_mutex_alloc);
+
+    return fd;
+}
+
 
 struct ScMemOpsS _sunxiMemOpsS =
 {
@@ -445,7 +481,8 @@ struct ScMemOpsS _sunxiMemOpsS =
     pfree:                sunxi_alloc_free,
     flush_cache:        sunxi_flush_cache,
     cpu_get_phyaddr:    sunxi_alloc_vir2phy,
-    cpu_get_viraddr:    sunxi_alloc_phy2vir
+    cpu_get_viraddr:    sunxi_alloc_phy2vir,
+    get_dma_buf_fd:     sunxi_get_dma_buf_fd
 
 };
 

@@ -62,6 +62,8 @@ struct ScMemOpsS
     void *(*palloc_secure)(int /*size*/, void*, void*);
 
     unsigned int (*get_ve_addr_offset)(void);
+    
+    int (*get_dma_buf_fd)(void *);
 };
 
 static inline int CdcMemOpen(struct ScMemOpsS *memops)

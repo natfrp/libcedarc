@@ -957,6 +957,42 @@ unsigned int ion_alloc_get_ve_addr_offset()
     }
 }
 
+int ion_get_dma_buf_fd(void *pbuf)
+{
+    int flag = 0;
+    unsigned long addr_vir = (unsigned long)pbuf;
+    int fd = 0;
+    buffer_node * tmp;
+
+    if (0 == pbuf)
+    {
+        // logv("can not vir2phy NULL buffer \n");
+        return 0;
+    }
+
+    pthread_mutex_lock(&g_mutex_alloc);
+
+    aw_mem_list_for_each_entry(tmp, &g_alloc_context->list, i_list)
+    {
+        if (addr_vir >= tmp->vir
+            && addr_vir < tmp->vir + tmp->size)
+        {
+            fd = tmp->fd_data.aw_fd;
+            flag = 1;
+            break;
+        }
+    }
+
+    if (0 == flag)
+    {
+        loge("ion_get_dma_buf_fd failed, do not find virtual address: 0x%lx \n", addr_vir);
+    }
+
+    pthread_mutex_unlock(&g_mutex_alloc);
+
+    return fd;
+}
+
 
 struct ScMemOpsS _ionMemOpsS =
 {
@@ -977,7 +1013,8 @@ struct ScMemOpsS _ionMemOpsS =
     setup:                ion_alloc_setup,
     shutdown:            ion_alloc_shutdown,
     palloc_secure:      ion_alloc_alloc_drm,
-    get_ve_addr_offset: ion_alloc_get_ve_addr_offset
+    get_ve_addr_offset: ion_alloc_get_ve_addr_offset,
+    get_dma_buf_fd:     ion_get_dma_buf_fd,
 };
 
 struct ScMemOpsS* __GetIonMemOpsS()
