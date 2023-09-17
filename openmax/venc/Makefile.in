@@ -88,7 +88,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = vdecoder
+subdir = openmax/venc
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -127,21 +127,20 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libvdecoder_la_DEPENDENCIES = $(top_srcdir)/base/libcdc_base.la \
-	$(top_srcdir)/memory/libMemAdapter.la
-am_libvdecoder_la_OBJECTS = libvdecoder_la-fbm.lo \
-	libvdecoder_la-pixel_format.lo libvdecoder_la-vdecoder.lo \
-	libvdecoder_la-sbmStream.lo libvdecoder_la-sbmFrameH265.lo \
-	libvdecoder_la-sbmFrameH264.lo libvdecoder_la-sbmFrameBase.lo
-libvdecoder_la_OBJECTS = $(am_libvdecoder_la_OBJECTS)
+libOmxVenc_la_DEPENDENCIES = $(top_builddir)/base/libcdc_base.la \
+	$(top_builddir)/memory/libMemAdapter.la
+am_libOmxVenc_la_OBJECTS = libOmxVenc_la-omx_venc.lo \
+	libOmxVenc_la-omx_tsem.lo \
+	libOmxVenc_la-omx_venc_linux_adapter.lo \
+	libOmxVenc_la-omx_common.lo
+libOmxVenc_la_OBJECTS = $(am_libOmxVenc_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libvdecoder_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(libvdecoder_la_CFLAGS) $(CFLAGS) $(libvdecoder_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
+libOmxVenc_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libOmxVenc_la_CFLAGS) \
+	$(CFLAGS) $(libOmxVenc_la_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -157,13 +156,10 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/libvdecoder_la-fbm.Plo \
-	./$(DEPDIR)/libvdecoder_la-pixel_format.Plo \
-	./$(DEPDIR)/libvdecoder_la-sbmFrameBase.Plo \
-	./$(DEPDIR)/libvdecoder_la-sbmFrameH264.Plo \
-	./$(DEPDIR)/libvdecoder_la-sbmFrameH265.Plo \
-	./$(DEPDIR)/libvdecoder_la-sbmStream.Plo \
-	./$(DEPDIR)/libvdecoder_la-vdecoder.Plo
+am__depfiles_remade = ./$(DEPDIR)/libOmxVenc_la-omx_common.Plo \
+	./$(DEPDIR)/libOmxVenc_la-omx_tsem.Plo \
+	./$(DEPDIR)/libOmxVenc_la-omx_venc.Plo \
+	./$(DEPDIR)/libOmxVenc_la-omx_venc_linux_adapter.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -183,8 +179,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libvdecoder_la_SOURCES)
-DIST_SOURCES = $(libvdecoder_la_SOURCES)
+SOURCES = $(libOmxVenc_la_SOURCES)
+DIST_SOURCES = $(libOmxVenc_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -356,29 +352,28 @@ CPPFLAGS_CDCG = -g -Wall -Werror -D_GNU_SOURCE \
                             -lm
 
 LDFLAGS_CDCG = -Wl,--no-undefined -avoid-version
-lib_LTLIBRARIES = libvdecoder.la
-libvdecoder_la_SOURCES = fbm.c \
-						     pixel_format.c \
-						     vdecoder.c \
-						     sbm/sbmStream.c \
-						     sbm/sbmFrameH265.c \
-						     sbm/sbmFrameH264.c \
-						     sbm/sbmFrameBase.c
+lib_LTLIBRARIES = libOmxVenc.la
+libOmxVenc_la_SOURCES = omx_venc.c\
+                        omx_tsem.c\
+                        omx_venc_linux_adapter.c \
+                        omx_common.c
 
-libvdecoder_la_CFLAGS = $(CFLAGS_CDCG) $(LOCAL_INCLUDE)
-LOCAL_INCLUDE = -I./ \
-                -I./videoengine \
-                -I$(top_srcdir)/vdecoder/include \
+libOmxVenc_la_CFLAGS = $(CFLAGS_CDCG) $(LOCAL_INCLUDE) \
+	-DCONF_OMX_ENABLE_ALIGN
+libOmxVenc_la_CPPFLAGS = $(CPPFLAGS_CDCG) $(LOCAL_INCLUDE) \
+	-DCONF_OMX_ENABLE_ALIGN
+LOCAL_INCLUDE = -I../include  \
+                -I$(top_srcdir)/openmax/omxcore/include \
+                -I$(top_srcdir)/openmax/include \
                 -I$(top_srcdir)/include \
                 -I$(top_srcdir)/base/include \
-				-I$(top_srcdir)/base/include \
                 -I$(top_srcdir)/ve/include
 
-libvdecoder_la_LDFLAGS = $(LDFLAGS_CDCG) $(LOCAL_LIB)
-libvdecoder_la_LIBADD = $(top_srcdir)/base/libcdc_base.la \
-						$(top_srcdir)/memory/libMemAdapter.la
+libOmxVenc_la_LDFLAGS = $(LDFLAGS_CDCG) $(LOCAL_LIB)
+libOmxVenc_la_LIBADD = $(top_builddir)/base/libcdc_base.la \
+                       $(top_builddir)/memory/libMemAdapter.la
 
-LOCAL_LIB = -ldl -lpthread -lVE -lvideoengine
+LOCAL_LIB = -ldl -lrt -lpthread -lvencoder -lVE
 all: all-am
 
 .SUFFIXES:
@@ -392,9 +387,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/Makefile.inc $(am__c
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign vdecoder/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign openmax/venc/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign vdecoder/Makefile
+	  $(AUTOMAKE) --foreign openmax/venc/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -449,8 +444,8 @@ clean-libLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-libvdecoder.la: $(libvdecoder_la_OBJECTS) $(libvdecoder_la_DEPENDENCIES) $(EXTRA_libvdecoder_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libvdecoder_la_LINK) -rpath $(libdir) $(libvdecoder_la_OBJECTS) $(libvdecoder_la_LIBADD) $(LIBS)
+libOmxVenc.la: $(libOmxVenc_la_OBJECTS) $(libOmxVenc_la_DEPENDENCIES) $(EXTRA_libOmxVenc_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libOmxVenc_la_LINK) -rpath $(libdir) $(libOmxVenc_la_OBJECTS) $(libOmxVenc_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -458,13 +453,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvdecoder_la-fbm.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvdecoder_la-pixel_format.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvdecoder_la-sbmFrameBase.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvdecoder_la-sbmFrameH264.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvdecoder_la-sbmFrameH265.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvdecoder_la-sbmStream.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvdecoder_la-vdecoder.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libOmxVenc_la-omx_common.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libOmxVenc_la-omx_tsem.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libOmxVenc_la-omx_venc.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libOmxVenc_la-omx_venc_linux_adapter.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -493,54 +485,33 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-libvdecoder_la-fbm.lo: fbm.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -MT libvdecoder_la-fbm.lo -MD -MP -MF $(DEPDIR)/libvdecoder_la-fbm.Tpo -c -o libvdecoder_la-fbm.lo `test -f 'fbm.c' || echo '$(srcdir)/'`fbm.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvdecoder_la-fbm.Tpo $(DEPDIR)/libvdecoder_la-fbm.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fbm.c' object='libvdecoder_la-fbm.lo' libtool=yes @AMDEPBACKSLASH@
+libOmxVenc_la-omx_venc.lo: omx_venc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libOmxVenc_la_CPPFLAGS) $(CPPFLAGS) $(libOmxVenc_la_CFLAGS) $(CFLAGS) -MT libOmxVenc_la-omx_venc.lo -MD -MP -MF $(DEPDIR)/libOmxVenc_la-omx_venc.Tpo -c -o libOmxVenc_la-omx_venc.lo `test -f 'omx_venc.c' || echo '$(srcdir)/'`omx_venc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libOmxVenc_la-omx_venc.Tpo $(DEPDIR)/libOmxVenc_la-omx_venc.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='omx_venc.c' object='libOmxVenc_la-omx_venc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -c -o libvdecoder_la-fbm.lo `test -f 'fbm.c' || echo '$(srcdir)/'`fbm.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libOmxVenc_la_CPPFLAGS) $(CPPFLAGS) $(libOmxVenc_la_CFLAGS) $(CFLAGS) -c -o libOmxVenc_la-omx_venc.lo `test -f 'omx_venc.c' || echo '$(srcdir)/'`omx_venc.c
 
-libvdecoder_la-pixel_format.lo: pixel_format.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -MT libvdecoder_la-pixel_format.lo -MD -MP -MF $(DEPDIR)/libvdecoder_la-pixel_format.Tpo -c -o libvdecoder_la-pixel_format.lo `test -f 'pixel_format.c' || echo '$(srcdir)/'`pixel_format.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvdecoder_la-pixel_format.Tpo $(DEPDIR)/libvdecoder_la-pixel_format.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pixel_format.c' object='libvdecoder_la-pixel_format.lo' libtool=yes @AMDEPBACKSLASH@
+libOmxVenc_la-omx_tsem.lo: omx_tsem.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libOmxVenc_la_CPPFLAGS) $(CPPFLAGS) $(libOmxVenc_la_CFLAGS) $(CFLAGS) -MT libOmxVenc_la-omx_tsem.lo -MD -MP -MF $(DEPDIR)/libOmxVenc_la-omx_tsem.Tpo -c -o libOmxVenc_la-omx_tsem.lo `test -f 'omx_tsem.c' || echo '$(srcdir)/'`omx_tsem.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libOmxVenc_la-omx_tsem.Tpo $(DEPDIR)/libOmxVenc_la-omx_tsem.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='omx_tsem.c' object='libOmxVenc_la-omx_tsem.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -c -o libvdecoder_la-pixel_format.lo `test -f 'pixel_format.c' || echo '$(srcdir)/'`pixel_format.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libOmxVenc_la_CPPFLAGS) $(CPPFLAGS) $(libOmxVenc_la_CFLAGS) $(CFLAGS) -c -o libOmxVenc_la-omx_tsem.lo `test -f 'omx_tsem.c' || echo '$(srcdir)/'`omx_tsem.c
 
-libvdecoder_la-vdecoder.lo: vdecoder.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -MT libvdecoder_la-vdecoder.lo -MD -MP -MF $(DEPDIR)/libvdecoder_la-vdecoder.Tpo -c -o libvdecoder_la-vdecoder.lo `test -f 'vdecoder.c' || echo '$(srcdir)/'`vdecoder.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvdecoder_la-vdecoder.Tpo $(DEPDIR)/libvdecoder_la-vdecoder.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='vdecoder.c' object='libvdecoder_la-vdecoder.lo' libtool=yes @AMDEPBACKSLASH@
+libOmxVenc_la-omx_venc_linux_adapter.lo: omx_venc_linux_adapter.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libOmxVenc_la_CPPFLAGS) $(CPPFLAGS) $(libOmxVenc_la_CFLAGS) $(CFLAGS) -MT libOmxVenc_la-omx_venc_linux_adapter.lo -MD -MP -MF $(DEPDIR)/libOmxVenc_la-omx_venc_linux_adapter.Tpo -c -o libOmxVenc_la-omx_venc_linux_adapter.lo `test -f 'omx_venc_linux_adapter.c' || echo '$(srcdir)/'`omx_venc_linux_adapter.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libOmxVenc_la-omx_venc_linux_adapter.Tpo $(DEPDIR)/libOmxVenc_la-omx_venc_linux_adapter.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='omx_venc_linux_adapter.c' object='libOmxVenc_la-omx_venc_linux_adapter.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -c -o libvdecoder_la-vdecoder.lo `test -f 'vdecoder.c' || echo '$(srcdir)/'`vdecoder.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libOmxVenc_la_CPPFLAGS) $(CPPFLAGS) $(libOmxVenc_la_CFLAGS) $(CFLAGS) -c -o libOmxVenc_la-omx_venc_linux_adapter.lo `test -f 'omx_venc_linux_adapter.c' || echo '$(srcdir)/'`omx_venc_linux_adapter.c
 
-libvdecoder_la-sbmStream.lo: sbm/sbmStream.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -MT libvdecoder_la-sbmStream.lo -MD -MP -MF $(DEPDIR)/libvdecoder_la-sbmStream.Tpo -c -o libvdecoder_la-sbmStream.lo `test -f 'sbm/sbmStream.c' || echo '$(srcdir)/'`sbm/sbmStream.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvdecoder_la-sbmStream.Tpo $(DEPDIR)/libvdecoder_la-sbmStream.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sbm/sbmStream.c' object='libvdecoder_la-sbmStream.lo' libtool=yes @AMDEPBACKSLASH@
+libOmxVenc_la-omx_common.lo: omx_common.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libOmxVenc_la_CPPFLAGS) $(CPPFLAGS) $(libOmxVenc_la_CFLAGS) $(CFLAGS) -MT libOmxVenc_la-omx_common.lo -MD -MP -MF $(DEPDIR)/libOmxVenc_la-omx_common.Tpo -c -o libOmxVenc_la-omx_common.lo `test -f 'omx_common.c' || echo '$(srcdir)/'`omx_common.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libOmxVenc_la-omx_common.Tpo $(DEPDIR)/libOmxVenc_la-omx_common.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='omx_common.c' object='libOmxVenc_la-omx_common.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -c -o libvdecoder_la-sbmStream.lo `test -f 'sbm/sbmStream.c' || echo '$(srcdir)/'`sbm/sbmStream.c
-
-libvdecoder_la-sbmFrameH265.lo: sbm/sbmFrameH265.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -MT libvdecoder_la-sbmFrameH265.lo -MD -MP -MF $(DEPDIR)/libvdecoder_la-sbmFrameH265.Tpo -c -o libvdecoder_la-sbmFrameH265.lo `test -f 'sbm/sbmFrameH265.c' || echo '$(srcdir)/'`sbm/sbmFrameH265.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvdecoder_la-sbmFrameH265.Tpo $(DEPDIR)/libvdecoder_la-sbmFrameH265.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sbm/sbmFrameH265.c' object='libvdecoder_la-sbmFrameH265.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -c -o libvdecoder_la-sbmFrameH265.lo `test -f 'sbm/sbmFrameH265.c' || echo '$(srcdir)/'`sbm/sbmFrameH265.c
-
-libvdecoder_la-sbmFrameH264.lo: sbm/sbmFrameH264.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -MT libvdecoder_la-sbmFrameH264.lo -MD -MP -MF $(DEPDIR)/libvdecoder_la-sbmFrameH264.Tpo -c -o libvdecoder_la-sbmFrameH264.lo `test -f 'sbm/sbmFrameH264.c' || echo '$(srcdir)/'`sbm/sbmFrameH264.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvdecoder_la-sbmFrameH264.Tpo $(DEPDIR)/libvdecoder_la-sbmFrameH264.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sbm/sbmFrameH264.c' object='libvdecoder_la-sbmFrameH264.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -c -o libvdecoder_la-sbmFrameH264.lo `test -f 'sbm/sbmFrameH264.c' || echo '$(srcdir)/'`sbm/sbmFrameH264.c
-
-libvdecoder_la-sbmFrameBase.lo: sbm/sbmFrameBase.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -MT libvdecoder_la-sbmFrameBase.lo -MD -MP -MF $(DEPDIR)/libvdecoder_la-sbmFrameBase.Tpo -c -o libvdecoder_la-sbmFrameBase.lo `test -f 'sbm/sbmFrameBase.c' || echo '$(srcdir)/'`sbm/sbmFrameBase.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvdecoder_la-sbmFrameBase.Tpo $(DEPDIR)/libvdecoder_la-sbmFrameBase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sbm/sbmFrameBase.c' object='libvdecoder_la-sbmFrameBase.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libvdecoder_la_CFLAGS) $(CFLAGS) -c -o libvdecoder_la-sbmFrameBase.lo `test -f 'sbm/sbmFrameBase.c' || echo '$(srcdir)/'`sbm/sbmFrameBase.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libOmxVenc_la_CPPFLAGS) $(CPPFLAGS) $(libOmxVenc_la_CFLAGS) $(CFLAGS) -c -o libOmxVenc_la-omx_common.lo `test -f 'omx_common.c' || echo '$(srcdir)/'`omx_common.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -675,13 +646,10 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/libvdecoder_la-fbm.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-pixel_format.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-sbmFrameBase.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-sbmFrameH264.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-sbmFrameH265.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-sbmStream.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-vdecoder.Plo
+		-rm -f ./$(DEPDIR)/libOmxVenc_la-omx_common.Plo
+	-rm -f ./$(DEPDIR)/libOmxVenc_la-omx_tsem.Plo
+	-rm -f ./$(DEPDIR)/libOmxVenc_la-omx_venc.Plo
+	-rm -f ./$(DEPDIR)/libOmxVenc_la-omx_venc_linux_adapter.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -727,13 +695,10 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/libvdecoder_la-fbm.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-pixel_format.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-sbmFrameBase.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-sbmFrameH264.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-sbmFrameH265.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-sbmStream.Plo
-	-rm -f ./$(DEPDIR)/libvdecoder_la-vdecoder.Plo
+		-rm -f ./$(DEPDIR)/libOmxVenc_la-omx_common.Plo
+	-rm -f ./$(DEPDIR)/libOmxVenc_la-omx_tsem.Plo
+	-rm -f ./$(DEPDIR)/libOmxVenc_la-omx_venc.Plo
+	-rm -f ./$(DEPDIR)/libOmxVenc_la-omx_venc_linux_adapter.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
